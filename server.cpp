@@ -1,5 +1,8 @@
 #include "server.h"
 #include <QDebug>
+#include <QFile> // Thêm dòng này để khai báo QFile
+#include <QCoreApplication> // Thư viện cho ứng dụng Qt
+#include <QDir>
 
 ChessServer::ChessServer(QObject *parent) : QTcpServer(parent)
 {
@@ -60,7 +63,68 @@ void ChessServer::onReadyRead()
                 qDebug() << "Client socket is not writable!";
             }
         }
-    } else {
+
+        if (type == "login") {
+            QString username = jsonObj.value("username").toString();
+            QString password = jsonObj.value("password").toString();
+            // Kiểm tra đăng nhập
+
+            bool loginSuccessful = false;
+            qDebug() << "Current working directory:" << QDir::currentPath();
+            QString path = QCoreApplication::applicationDirPath() + "/account.txt";
+            qDebug() << "Account file path:" << path;
+            QFile file(path);
+
+
+
+
+            if (!file.exists()) {
+                qDebug() << "File account.txt does not exist!";
+            }
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QTextStream in(&file);
+                while (!in.atEnd()) {
+                    QString line = in.readLine();
+                    QStringList parts = line.split(" ");
+                    if (parts.size() >= 5) {
+                        // Kiểm tra nếu username và password khớp
+                        if (parts[2] == username && parts[4] == password) {
+                            loginSuccessful = true;
+                            break;
+                        }
+                    }
+                }
+                file.close();
+            } else {
+                qDebug() << "Unable to open account file!";
+            }
+
+            // Tạo JSON phản hồi
+            QJsonObject responseJson;
+            if (loginSuccessful) {
+                responseJson["type"] = "login_ack";
+                responseJson["status"] = "success";
+                responseJson["message"] = "Login successful!";
+            } else {
+                responseJson["type"] = "login_ack";
+                responseJson["status"] = "failed";
+                responseJson["message"] = "Invalid username or password!";
+            }
+
+            QJsonDocument doc(responseJson);
+            QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+
+            // Gửi phản hồi về cho client
+            if (clientSocket && clientSocket->isWritable()) {
+                clientSocket->write(responseData);
+                clientSocket->flush();  // Đảm bảo dữ liệu được gửi ngay lập tức
+                qDebug() << "Sent response to client:" << responseData;
+            } else {
+                qDebug() << "Client socket is not writable!";
+            }
+        }
+    }
+    else {
         qDebug() << "Received data is not a JSON object.";
     }
 }
