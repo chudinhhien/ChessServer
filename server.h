@@ -5,6 +5,10 @@
 #include <QTcpSocket>
 #include <QObject>
 #include <QList>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+
 
 class ChessServer : public QTcpServer
 {

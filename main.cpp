@@ -6,7 +6,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     ChessServer server;
-    server.startServer(1234);
+    server.startServer(5500);
 
     return a.exec();
 }

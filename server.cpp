@@ -37,14 +37,30 @@ void ChessServer::onClientDisconnected()
 void ChessServer::onReadyRead()
 {
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
-    QString moveData = QString::fromUtf8(clientSocket->readAll());
+    QByteArray data = clientSocket->readAll();//Đọc data từ socket
 
-    qDebug() << "Move received:" << moveData;
+    //Convert sang json
+    QJsonDocument jsonData = QJsonDocument::fromJson(data);
 
-    // Gửi nước đi tới tất cả các client khác
-    for (QTcpSocket *client : clients) {
-        if (client != clientSocket) {
-            client->write(moveData.toUtf8());
+    if(jsonData.isObject()) {
+        QJsonObject jsonObj = jsonData.object();
+        QString type = jsonObj.value("type").toString();
+        if(type == "register") {
+            QJsonObject json;
+            json["type"] = "register_ack";
+            json["status"] = "success";
+            json["message"] = "Registration successful!";
+            QJsonDocument doc(json);
+            QByteArray data = doc.toJson(QJsonDocument::Compact);
+            if (clientSocket && clientSocket->isWritable()) {
+                clientSocket->write(data);
+                clientSocket->flush(); // Đảm bảo dữ liệu được gửi ngay lập tức
+                qDebug() << "Sent response to client:" << data;
+            } else {
+                qDebug() << "Client socket is not writable!";
+            }
         }
+    } else {
+        qDebug() << "Received data is not a JSON object.";
     }
 }
