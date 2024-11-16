@@ -1,0 +1,6 @@
+[requires]
+jwt-cpp/0.7.0
+nlohmann_json/3.11.3
+
+[generators]
+qmake

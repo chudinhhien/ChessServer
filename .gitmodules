@@ -1,0 +1,3 @@
+[submodule "external/jwtpp"]
+	path = external/jwtpp
+	url = https://github.com/troian/jwtpp.git

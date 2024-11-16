@@ -1,33 +1,31 @@
+// server.h
 #ifndef SERVER_H
 #define SERVER_H
 
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QObject>
 #include <QList>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
+#include "authenticationmanager.h"
 
-
-class ChessServer : public QTcpServer
-{
+class ChessServer : public QTcpServer {
     Q_OBJECT
-
 public:
     explicit ChessServer(QObject *parent = nullptr);
-    void startServer(int port);
-
-signals:
-    void newMoveReceived(const QString &moveData);
-
-private slots:
+    bool startServer(int port);
     void onNewConnection();
-    void onClientDisconnected();
+private slots:
     void onReadyRead();
+    void onClientDisconnected();
 
 private:
-    QList<QTcpSocket *> clients;  // Danh sách các client kết nối
+    QList<QTcpSocket*> clients;
+    AuthenticationManager authManager;
+
+    void sendResponse(QTcpSocket *clientSocket, const QString &type, const QString &status, const QString &message, const QString &token = "");
+    void sendErrorResponse(QTcpSocket *clientSocket, const QString &errorMessage);
+
+    void handleRegister(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
+    void handleLogin(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
 };
 
 #endif // SERVER_H

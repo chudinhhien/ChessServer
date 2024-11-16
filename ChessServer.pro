@@ -1,28 +1,33 @@
-QT = core
-QT += network
+QT += core network sql
 
-CONFIG += c++17 cmdline
-
-# You can make your code fail to compile if it uses deprecated APIs.
-# In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+CONFIG += c++17 cmdline lrelease embed_translations
 
 SOURCES += \
-        main.cpp \
-        server.cpp
+    authenticationmanager.cpp \
+    databasemanager.cpp \
+    main.cpp \
+    server.cpp \
+    user.cpp \
+    utils.cpp
 
-TRANSLATIONS += \
-    ChessServer_en_GB.ts
-CONFIG += lrelease
-CONFIG += embed_translations
+HEADERS += \
+    authenticationmanager.h \
+    databasemanager.h \
+    server.h \
+    user.h \
+    utils.h
+
+DISTFILES += \
+    account.txt \
+    conanfile.txt \
+    config.env
+
+TRANSLATIONS +=
+
+CONFIG += conan_basic_setup
+include(conanbuildinfo.pri)
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
-
-HEADERS += \
-    server.h
-
-DISTFILES += \
-    account.txt

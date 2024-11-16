@@ -72,3 +72,21 @@ CMakeLists.txt.user*
 *.dll
 *.exe
 
+# Conan generated files
+# ---------------------
+conan.lock
+conanbuildinfo.pri
+conaninfo.txt
+graph_info.json
+conanbuildinfo.cmake
+conanbuildinfo.txt
+conanfile.pyc
+conanfile.py~
+*.conan
+
+# Conan directories
+conan/
+
+# Conan's local cache directory (may vary based on system)
+~/.conan/
+
