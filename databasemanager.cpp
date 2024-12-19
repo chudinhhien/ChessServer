@@ -4,6 +4,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 
+
 DatabaseManager& DatabaseManager::instance() {
     static DatabaseManager instance;
     return instance;
@@ -56,6 +57,51 @@ void DatabaseManager::createTableForUser() {
     }
 }
 
-QSqlDatabase DatabaseManager::getDatabase() const {
-    return db;
+void DatabaseManager::createTableForMatches() {
+    QSqlQuery query(db);
+    QString createTableQuery = R"(
+        CREATE TABLE IF NOT EXISTS matches (
+            match_id VARCHAR(36) PRIMARY KEY,
+            player1 VARCHAR(255) NOT NULL,
+            player2 VARCHAR(255) NOT NULL,
+            status ENUM('pending', 'ongoing', 'finished') NOT NULL,
+            start_time DATETIME NOT NULL,
+            end_time DATETIME
+        )
+    )";
+    if (!query.exec(createTableQuery)) {
+        qDebug() << "Failed to create table:" << query.lastError().text();
+    } else {
+        qDebug() << "Table created successfully!";
+    }
 }
+
+QSqlDatabase DatabaseManager::getDatabase() {
+    QString connectionName = QString("ThreadConnection-%1").arg(reinterpret_cast<quintptr>(QThread::currentThreadId()));
+
+
+    // Nếu kết nối chưa tồn tại, tạo mới
+    if (!QSqlDatabase::contains(connectionName)) {
+        QSqlDatabase threadDb = QSqlDatabase::addDatabase("QMYSQL", connectionName);
+        threadDb.setHostName(db.hostName());
+        threadDb.setDatabaseName(db.databaseName());
+        threadDb.setUserName(db.userName());
+        threadDb.setPassword(db.password());
+
+        if (!threadDb.open()) {
+            qCritical() << "Failed to open database for thread:" << threadDb.lastError().text();
+            return QSqlDatabase();
+        }
+    }
+
+    return QSqlDatabase::database(connectionName);
+}
+
+void DatabaseManager::cleanupConnection() {
+    QString connectionName = QString("ThreadConnection-%1").arg(reinterpret_cast<quintptr>(QThread::currentThreadId()));
+    if (QSqlDatabase::contains(connectionName)) {
+        QSqlDatabase::removeDatabase(connectionName);  // Xóa kết nối của luồng hiện tại
+    }
+}
+
+

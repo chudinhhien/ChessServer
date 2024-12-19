@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QSqlDatabase>
+#include <QThread>
 
 class DatabaseManager : public QObject {
     Q_OBJECT
@@ -10,7 +11,9 @@ public:
     static DatabaseManager& instance();
     bool openConnection();
     void createTableForUser();
-    QSqlDatabase getDatabase() const;
+    void createTableForMatches();
+    QSqlDatabase getDatabase();
+    void cleanupConnection();
 
 private:
     explicit DatabaseManager(QObject *parent = nullptr);

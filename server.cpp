@@ -4,9 +4,11 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QDebug>
+#include <QJsonArray>
 
-ChessServer::ChessServer(QObject *parent) : QTcpServer(parent) {
+ChessServer::ChessServer(QObject *parent) : QTcpServer(parent), matchmaker(new Matchmaker(this)), clientManager(new ClientManager(this)) {
     connect(this, &QTcpServer::newConnection, this, &ChessServer::onNewConnection);
+    matchmaker->start();
 }
 
 bool ChessServer::startServer(int port) {
@@ -26,8 +28,6 @@ void ChessServer::onNewConnection() {
         return;
     }
 
-    clients.append(clientSocket);
-
     connect(clientSocket, &QTcpSocket::readyRead, this, &ChessServer::onReadyRead);
     connect(clientSocket, &QTcpSocket::disconnected, this, &ChessServer::onClientDisconnected);
 
@@ -36,7 +36,7 @@ void ChessServer::onNewConnection() {
 
 void ChessServer::onClientDisconnected() {
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
-    clients.removeAll(clientSocket);
+    clients.remove(clientSocket);
     clientSocket->deleteLater();
     qDebug() << "Client disconnected";
 }
@@ -68,6 +68,26 @@ void ChessServer::onReadyRead() {
     else if (type == "login") {
         handleLogin(jsonObj, clientSocket);
     }
+    else if(type == "find_match"){
+        matchmaker->addPlayer(clientSocket,jsonObj.value("username").toString());
+    }
+    else if(type == "connect") {
+        QJsonObject json;
+        json["type"] = "connect_ack";
+        json["status"] = "success";
+        json["message"] = "Login success!";
+        QJsonDocument doc(json);
+        QByteArray responseData = doc.toJson(QJsonDocument::Compact);
+        clientSocket->write(responseData);
+        clientSocket->flush();
+        qDebug() << "Sent response to client:" << responseData;
+    }
+    else if(type == "update_profile") {
+        clientManager->handleUpdateProfileAck(clientSocket,jsonObj);
+    }
+    else if(type == "change_password") {
+        clientManager->handleChangePasswordAck(clientSocket,jsonObj);
+    }
     else {
         qDebug() << "Unknown request type:" << type;
         sendErrorResponse(clientSocket, "Unknown request type.");
@@ -94,6 +114,29 @@ void ChessServer::sendResponse(QTcpSocket *clientSocket, const QString &type, co
     }
 }
 
+void ChessServer::sendOnlinePlayers(QTcpSocket *clientSocket) {
+    QJsonObject playerListMessage;
+    playerListMessage["type"] = "list_players";
+    playerListMessage["status"] = "success";
+
+    // Tạo danh sách các người chơi online
+    QJsonArray playerArray;
+    for (auto it = clients.begin(); it != clients.end(); ++it) {
+        QJsonObject player;
+        player["username"] = it.value();  // Lấy username từ connectedClients
+        playerArray.append(player);
+    }
+
+    playerListMessage["players"] = playerArray;
+
+    QJsonDocument doc(playerListMessage);
+    QByteArray data = doc.toJson();
+
+    clientSocket->write(data);
+    clientSocket->flush();
+    qDebug() << "Sent player list to client.";
+}
+
 void ChessServer::sendErrorResponse(QTcpSocket *clientSocket, const QString &errorMessage) {
     sendResponse(clientSocket, "error", "failed", errorMessage);
 }
@@ -116,10 +159,12 @@ void ChessServer::handleLogin(const QJsonObject &jsonObj, QTcpSocket *clientSock
 
     QString token;
     QString errorMessage;
-    bool success = authManager.loginUser(username, password, token, errorMessage);
+    bool success = authManager.loginUser(clientSocket,username, password, token, errorMessage);
 
     if (success) {
-        sendResponse(clientSocket, "login_ack", "success", "Login successful!", token);
+        clients[clientSocket] = username;
+        // sendResponse(clientSocket, "login_ack", "success", "Login successful!", token);
+        // sendOnlinePlayers(clientSocket);
     } else {
         sendResponse(clientSocket, "login_ack", "failed", errorMessage);
     }

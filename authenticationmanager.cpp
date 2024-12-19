@@ -9,6 +9,7 @@
 #include <utils.h>
 #include <jwt-cpp/jwt.h>
 #include <jwt-cpp/traits/nlohmann-json/traits.h>
+#include <QJsonDocument>
 using traits = jwt::traits::nlohmann_json;
 
 AuthenticationManager::AuthenticationManager(QObject *parent) : QObject(parent) {
@@ -64,9 +65,9 @@ bool AuthenticationManager::registerUser(User &user, QString &errorMessage) {
     return true;
 }
 
-bool AuthenticationManager::loginUser(const QString &username, const QString &password, QString &token, QString &errorMessage) {
+bool AuthenticationManager::loginUser(QTcpSocket *clientSocket, const QString &username, const QString &password, QString &token, QString &errorMessage) {
     QSqlQuery query;
-    query.prepare("SELECT password, salt, name FROM users WHERE username = :username");
+    query.prepare("SELECT password, salt, name, elo FROM users WHERE username = :username");
     query.bindValue(":username", username);
 
     if (!query.exec()) {
@@ -82,6 +83,11 @@ bool AuthenticationManager::loginUser(const QString &username, const QString &pa
     QString storedHash = query.value("password").toString();
     QString salt = query.value("salt").toString();
     QString name = query.value("name").toString();
+    QString elo = query.value("elo").toString();
+
+    qDebug() << elo << "\n";
+
+    QJsonObject res;
 
     QString hashedInput = hashPassword(password, salt);
     if (hashedInput != storedHash) {
@@ -89,10 +95,23 @@ bool AuthenticationManager::loginUser(const QString &username, const QString &pa
         return false;
     }
 
+    res["type"] = "login_ack";
+    res["status"] = "success";
+    res["message"] = "Login successful!";
+    res["name"] = name;
+    res["username"] = username;
+    res["password"] = password;
+    res["elo"] = elo;
+
+    QJsonDocument doc(res);
+    QByteArray data = doc.toJson();
+
+    clientSocket->write(data);
+    clientSocket->flush();
+
     // Tạo token JWT
     try {
         QString secretKey = utils::getEnvVariableFromFile("config.env", "JWT_SECRET_KEY");
-        qDebug() << secretKey << "\n";
         auto jwtToken = jwt::create<traits>()
         .set_issuer("ChessServer")
             .set_type("JWS")

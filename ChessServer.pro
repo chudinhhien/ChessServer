@@ -3,6 +3,9 @@ QT += core network sql
 CONFIG += c++17 cmdline lrelease embed_translations
 
 SOURCES += \
+    ClientManager.cpp \
+    Game.cpp \
+    Matchmaker.cpp \
     authenticationmanager.cpp \
     databasemanager.cpp \
     main.cpp \
@@ -11,6 +14,9 @@ SOURCES += \
     utils.cpp
 
 HEADERS += \
+    ClientManager.h \
+    Game.h \
+    Matchmaker.h \
     authenticationmanager.h \
     databasemanager.h \
     server.h \

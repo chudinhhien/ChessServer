@@ -90,3 +90,6 @@ conan/
 # Conan's local cache directory (may vary based on system)
 ~/.conan/
 
+#build
+./build
+

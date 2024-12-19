@@ -6,6 +6,8 @@
 #include <QTcpSocket>
 #include <QList>
 #include "authenticationmanager.h"
+#include "Matchmaker.h"
+#include "ClientManager.h"
 
 class ChessServer : public QTcpServer {
     Q_OBJECT
@@ -18,11 +20,14 @@ private slots:
     void onClientDisconnected();
 
 private:
-    QList<QTcpSocket*> clients;
+    Matchmaker *matchmaker;
+    ClientManager *clientManager;
+    QMap<QTcpSocket*, QString> clients;
     AuthenticationManager authManager;
 
     void sendResponse(QTcpSocket *clientSocket, const QString &type, const QString &status, const QString &message, const QString &token = "");
     void sendErrorResponse(QTcpSocket *clientSocket, const QString &errorMessage);
+    void sendOnlinePlayers(QTcpSocket *clientSocket);
 
     void handleRegister(const QJsonObject &jsonObj, QTcpSocket *clientSocket);
     void handleLogin(const QJsonObject &jsonObj, QTcpSocket *clientSocket);

@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 
     // Tạo bảng users nếu chưa tồn tại
     dbManager.createTableForUser();
+    dbManager.createTableForMatches();
 
     // Khởi tạo AuthenticationManager
     AuthenticationManager authManager;
