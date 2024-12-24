@@ -79,19 +79,19 @@ void RoomService::handleInviteResponse(const QString &fromPlayer, bool accepted)
 
         // Tạo phản hồi cho người mời
         QJsonObject userObject;
-        userObject["name"] = toUser.getName();
-        userObject["username"] = toUser.getUsername();
-        userObject["elo"] = toUser.getElo();
-        userObject["state"] = "In Room"; // Trạng thái mới
+        userObject["name"] = fromUser.getName();
+        userObject["username"] = fromUser.getUsername();
+        userObject["elo"] = fromUser.getElo();
+        userObject["state"] = fromUser.getState(); // Trạng thái mới
 
         responseMessage["status"] = "success";
         responseMessage["message"] = "Invite accepted.";
         responseMessage["user"] = userObject;
 
-        userObject["name"] = fromUser.getName();
-        userObject["username"] = fromUser.getUsername();
-        userObject["elo"] = fromUser.getElo();
-        userObject["state"] = fromUser.getState(); // Trạng thái mới
+        userObject["name"] = toUser.getName();
+        userObject["username"] = toUser.getUsername();
+        userObject["elo"] = toUser.getElo();
+        userObject["state"] = toUser.getState(); // Trạng thái mới
 
         // Tạo phản hồi cho người được mời
         responseMessageRepond["status"] = "success";
@@ -100,13 +100,13 @@ void RoomService::handleInviteResponse(const QString &fromPlayer, bool accepted)
 
         // Gửi phản hồi đến người mời
         QJsonDocument docFrom(responseMessage);
-        fromSocket->write(docFrom.toJson());
-        fromSocket->flush();
+        toSocket->write(docFrom.toJson());
+        toSocket->flush();
 
         // Gửi phản hồi đến người được mời
         QJsonDocument docTo(responseMessageRepond);
-        toSocket->write(docTo.toJson());
-        toSocket->flush();
+        fromSocket->write(docTo.toJson());
+        fromSocket->flush();
 
         qDebug() << "Invite accepted by" << toPlayer << "from" << fromPlayer;
     } else {
