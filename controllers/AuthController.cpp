@@ -40,7 +40,13 @@ void AuthController::handleGetOnlinePlayers(QTcpSocket *client) {
     QList<User> onlinePlayers = service->getOnlinePlayers();
 
     QJsonArray playersArray;
+    QString requestingUsername = service->getUsernameBySocket(client); // Lấy username từ socket
+
     for (const User &user : onlinePlayers) {
+        if (user.getUsername() == requestingUsername) {
+            continue; // Bỏ qua chính người dùng đang gửi yêu cầu
+        }
+
         QJsonObject playerJson;
         playerJson["name"] = user.getName();
         playerJson["username"] = user.getUsername();
@@ -59,6 +65,5 @@ void AuthController::handleGetOnlinePlayers(QTcpSocket *client) {
     client->write(doc.toJson());
     client->flush();
 
-    qDebug() << "Sent list of online players to client.";
+    qDebug() << "Sent list of online players to client. Excluded username:" << requestingUsername;
 }
-

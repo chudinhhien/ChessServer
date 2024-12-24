@@ -79,6 +79,7 @@ void ChessServer::onNewConnection() {
 void ChessServer::onClientDisconnected() {
     QTcpSocket *clientSocket = qobject_cast<QTcpSocket *>(sender());
     if (clientSocket) {
+        matchController->removePlayerFromQueue(clientSocket);
         authService->playerLoggedOut(clientSocket);
         clientSocket->deleteLater();
         qDebug() << "Client disconnected";

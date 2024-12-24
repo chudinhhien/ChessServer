@@ -101,4 +101,14 @@ void MatchController::handlePlayerMove(QTcpSocket *sender, const QString &matchI
     qDebug() << "Move forwarded to opponent in match" << matchId;
 }
 
+void MatchController::removePlayerFromQueue(QTcpSocket *socket) {
+    for (int i = 0; i < waitingQueue.size(); ++i) {
+        if (waitingQueue[i].first == socket) {
+            qDebug() << "Removing player from queue:" << waitingQueue[i].second;
+            waitingQueue.removeAt(i);
+            break;
+        }
+    }
+}
+
 

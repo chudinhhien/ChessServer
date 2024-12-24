@@ -15,6 +15,7 @@ public:
     void handleFindMatch(QTcpSocket *client, const QString &username);
 
     void handlePlayerMove(QTcpSocket *sender, const QString &matchId, const QJsonObject &moveData);
+    void removePlayerFromQueue(QTcpSocket *socket);
 
 private:
     MatchService *service;

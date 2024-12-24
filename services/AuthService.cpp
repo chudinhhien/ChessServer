@@ -42,6 +42,11 @@ void AuthService::playerLoggedOut(QTcpSocket *socket) {
     repository->removeOnlinePlayer(socket);
 }
 
+QString AuthService::getUsernameBySocket(QTcpSocket *socket) const {
+    return repository->getUsernameBySocket(socket);
+}
+
+
 QList<User> AuthService::getOnlinePlayers() const {
     return repository->getOnlinePlayers();
 }

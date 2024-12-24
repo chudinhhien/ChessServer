@@ -125,6 +125,13 @@ void UserRepository::removeOnlinePlayer(QTcpSocket *socket) {
     }
 }
 
+QString UserRepository::getUsernameBySocket(QTcpSocket *socket) const {
+    if (onlinePlayers.contains(socket)) {
+        return onlinePlayers[socket].getUsername();
+    }
+    return QString(); // Trả về chuỗi rỗng nếu không tìm thấy
+}
+
 QList<User> UserRepository::getOnlinePlayers() const {
     return onlinePlayers.values(); // Trả về danh sách User đang online
 }

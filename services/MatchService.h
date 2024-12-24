@@ -15,7 +15,6 @@ public:
 
     // Lấy danh sách socket của hai người chơi trong một trận đấu
     QPair<QTcpSocket *, QTcpSocket *> getPlayersInMatch(const QString &matchId);
-
 private:
     MatchRepository *repository;
     QMap<QString, QPair<QTcpSocket *, QTcpSocket *>> activeMatches; // Lưu matchId và cặp socket của hai người chơi
