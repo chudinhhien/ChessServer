@@ -34,100 +34,68 @@ QString AuthenticationManager::hashPassword(const QString &password, const QStri
     return QString(hash.toHex());
 }
 
-bool AuthenticationManager::registerUser(User &user, QString &errorMessage) {
-    user.salt = generateSalt();
-    user.password = hashPassword(user.password, user.salt);
+// bool AuthenticationManager::loginUser(QTcpSocket *clientSocket, const QString &username, const QString &password, QString &token, QString &errorMessage) {
+//     QSqlQuery query;
+//     query.prepare("SELECT password, salt, name, elo FROM users WHERE username = :username");
+//     query.bindValue(":username", username);
 
-    QSqlQuery query;
-    query.prepare("SELECT COUNT(*) FROM users WHERE username = :username");
-    query.bindValue(":username", user.username);
-    if (!query.exec()) {
-        errorMessage = "Database query failed.";
-        return false;
-    }
+//     if (!query.exec()) {
+//         errorMessage = "Database query failed.";
+//         return false;
+//     }
 
-    if (query.next() && query.value(0).toInt() > 0) {
-        errorMessage = "Username already exists.";
-        return false;
-    }
+//     if (!query.next()) {
+//         errorMessage = "Invalid username or password.";
+//         return false;
+//     }
 
-    query.prepare("INSERT INTO users (username, password, salt, name, elo) VALUES (:username, :password, :salt, :name, :elo)");
-    query.bindValue(":username", user.username);
-    query.bindValue(":password", user.password);
-    query.bindValue(":salt", user.salt);
-    query.bindValue(":name", user.name);
-    query.bindValue(":elo", user.elo);
+//     QString storedHash = query.value("password").toString();
+//     QString salt = query.value("salt").toString();
+//     QString name = query.value("name").toString();
+//     QString elo = query.value("elo").toString();
 
-    if (!query.exec()) {
-        errorMessage = "Error saving data.";
-        return false;
-    }
+//     qDebug() << elo << "\n";
 
-    return true;
-}
+//     QJsonObject res;
 
-bool AuthenticationManager::loginUser(QTcpSocket *clientSocket, const QString &username, const QString &password, QString &token, QString &errorMessage) {
-    QSqlQuery query;
-    query.prepare("SELECT password, salt, name, elo FROM users WHERE username = :username");
-    query.bindValue(":username", username);
+//     QString hashedInput = hashPassword(password, salt);
+//     if (hashedInput != storedHash) {
+//         errorMessage = "Invalid username or password.";
+//         return false;
+//     }
 
-    if (!query.exec()) {
-        errorMessage = "Database query failed.";
-        return false;
-    }
+//     res["type"] = "login_ack";
+//     res["status"] = "success";
+//     res["message"] = "Login successful!";
+//     res["name"] = name;
+//     res["username"] = username;
+//     res["password"] = password;
+//     res["elo"] = elo;
 
-    if (!query.next()) {
-        errorMessage = "Invalid username or password.";
-        return false;
-    }
+//     QJsonDocument doc(res);
+//     QByteArray data = doc.toJson();
 
-    QString storedHash = query.value("password").toString();
-    QString salt = query.value("salt").toString();
-    QString name = query.value("name").toString();
-    QString elo = query.value("elo").toString();
+//     clientSocket->write(data);
+//     clientSocket->flush();
 
-    qDebug() << elo << "\n";
+//     // Tạo token JWT
+//     try {
+//         QString secretKey = utils::getEnvVariableFromFile("config.env", "JWT_SECRET_KEY");
+//         auto jwtToken = jwt::create<traits>()
+//         .set_issuer("ChessServer")
+//             .set_type("JWS")
+//             .set_payload_claim("username", username.toStdString())
+//             .set_payload_claim("name", name.toStdString())
+//             .set_issued_at(std::chrono::system_clock::now())
+//             .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{60})
+//             .sign(jwt::algorithm::hs256{secretKey.toStdString()});
 
-    QJsonObject res;
+//         token = QString::fromStdString(jwtToken);
+//     }
+//     catch (const std::exception &e) {
+//         errorMessage = "Token generation failed.";
+//         return false;
+//     }
 
-    QString hashedInput = hashPassword(password, salt);
-    if (hashedInput != storedHash) {
-        errorMessage = "Invalid username or password.";
-        return false;
-    }
-
-    res["type"] = "login_ack";
-    res["status"] = "success";
-    res["message"] = "Login successful!";
-    res["name"] = name;
-    res["username"] = username;
-    res["password"] = password;
-    res["elo"] = elo;
-
-    QJsonDocument doc(res);
-    QByteArray data = doc.toJson();
-
-    clientSocket->write(data);
-    clientSocket->flush();
-
-    // Tạo token JWT
-    try {
-        QString secretKey = utils::getEnvVariableFromFile("config.env", "JWT_SECRET_KEY");
-        auto jwtToken = jwt::create<traits>()
-        .set_issuer("ChessServer")
-            .set_type("JWS")
-            .set_payload_claim("username", username.toStdString())
-            .set_payload_claim("name", name.toStdString())
-            .set_issued_at(std::chrono::system_clock::now())
-            .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{60})
-            .sign(jwt::algorithm::hs256{secretKey.toStdString()});
-
-        token = QString::fromStdString(jwtToken);
-    }
-    catch (const std::exception &e) {
-        errorMessage = "Token generation failed.";
-        return false;
-    }
-
-    return true;
-}
+//     return true;
+// }

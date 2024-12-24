@@ -4,7 +4,7 @@
 
 #include <QObject>
 #include <QString>
-#include "user.h"
+#include "User.h"
 #include <QTcpSocket>
 
 class AuthenticationManager : public QObject {
@@ -14,9 +14,9 @@ public:
     bool registerUser(User &user, QString &errorMessage);
     bool loginUser(QTcpSocket *clientSocket,const QString &username, const QString &password, QString &token, QString &errorMessage);
     QString hashPassword(const QString &password, const QString &salt);
+    QString generateSalt(int length = 16);
 
 private:
-    QString generateSalt(int length = 16);
     // Thêm các thành phần cần thiết khác như quản lý cơ sở dữ liệu
 };
 

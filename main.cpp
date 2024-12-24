@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
 
     ChessServer server;
-    if (!server.startServer(12345)) {
+    if (!server.startServer(5500)) {
         qCritical() << "Failed to start server.";
         return -1;
     }

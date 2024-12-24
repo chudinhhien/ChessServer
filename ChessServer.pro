@@ -8,13 +8,18 @@ SOURCES += \
     Game.cpp \
     Matchmaker.cpp \
     authenticationmanager.cpp \
+    controllers/AuthController.cpp \
     controllers/MatchController.cpp \
+    controllers/RoomController.cpp \
     databasemanager.cpp \
+    entities/User.cpp \
     main.cpp \
     repositories/MatchRepository.cpp \
-    server.cpp \
+    repositories/RoomRepository.cpp \
+    repositories/UserRepository.cpp \
+    services/AuthService.cpp \
     services/MatchService.cpp \
-    user.cpp \
+    services/RoomService.cpp \
     utils.cpp
 
 HEADERS += \
@@ -23,12 +28,17 @@ HEADERS += \
     Game.h \
     Matchmaker.h \
     authenticationmanager.h \
+    controllers/AuthController.h \
     controllers/MatchController.h \
+    controllers/RoomController.h \
     databasemanager.h \
+    entities/User.h \
     repositories/MatchRepository.h \
-    server.h \
+    repositories/RoomRepository.h \
+    repositories/UserRepository.h \
+    services/AuthService.h \
     services/MatchService.h \
-    user.h \
+    services/RoomService.h \
     utils.h
 
 DISTFILES += \
@@ -45,6 +55,7 @@ INCLUDEPATH += $$PWD/3rdparty/json/include
 INCLUDEPATH += $$PWD/controllers
 INCLUDEPATH += $$PWD/services
 INCLUDEPATH += $$PWD/repositories
+INCLUDEPATH += $$PWD/entities
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
