@@ -136,7 +136,7 @@ QString RoomService::createMatch(const QString &player1, const QString &player2)
     QTcpSocket* player2Socket = authService->getSocketByUserName(player2);
     QString matchId = matchService->createMatch(player1, player2, player1Socket , player2Socket);
     QJsonObject response1;
-    response1["type"] = "find_match_ack";
+    response1["type"] = "start_game_ack";
     response1["status"] = "success";
     response1["match_id"] = matchId;
     response1["opponent"] = player2;
