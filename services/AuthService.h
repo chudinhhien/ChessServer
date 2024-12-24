@@ -13,6 +13,7 @@ public:
     void playerLoggedIn(QTcpSocket *socket, const QString &username);
     void playerLoggedOut(QTcpSocket *socket);
     void updatePlayerStatus(QTcpSocket *socket, const QString &status);
+    User getUserInfo(const QString &username) const;
     QString getUsernameBySocket(QTcpSocket *socket) const;
     QList<User> getOnlinePlayers() const;
 private:

@@ -56,3 +56,6 @@ void AuthService::updatePlayerStatus(QTcpSocket *socket, const QString &status) 
     qDebug() << "Player status updated to:" << status;
 }
 
+User AuthService::getUserInfo(const QString &username) const {
+    return repository->getUserByUsername(username);
+}

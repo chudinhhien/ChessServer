@@ -146,4 +146,23 @@ void UserRepository::updatePlayerStatus(QTcpSocket *socket, const QString &statu
     }
 }
 
+User UserRepository::getUserByUsername(const QString &username) const {
+    QSqlQuery query(db);
+    query.prepare("SELECT name, username, elo FROM users WHERE username = :username");
+    query.bindValue(":username", username);
+
+    if (!query.exec() || !query.next()) {
+        qWarning() << "Failed to fetch user info for username:" << username << query.lastError().text();
+        return User(); // Trả về đối tượng User mặc định nếu không tìm thấy
+    }
+
+    User user;
+    user.setName(query.value("name").toString());
+    user.setUsername(query.value("username").toString());
+    user.setElo(query.value("elo").toInt());
+    user.setState("Online"); // Thiết lập trạng thái mặc định là Online
+    return user;
+}
+
+
 

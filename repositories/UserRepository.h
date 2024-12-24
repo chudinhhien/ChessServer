@@ -18,6 +18,7 @@ public:
     void removeOnlinePlayer(QTcpSocket *socket);
     void updatePlayerStatus(QTcpSocket *socket, const QString &status);
     QString getUsernameBySocket(QTcpSocket *socket) const;
+    User getUserByUsername(const QString &username) const;
     QList<User> getOnlinePlayers() const;
 
 private:

@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QSqlError>
 #include <utils.h>
-#include <QTimer>
 
 ChessServer::ChessServer(QObject *parent) : QTcpServer(parent) {
     // Thiết lập cơ sở dữ liệu
@@ -126,11 +125,6 @@ void ChessServer::onReadyRead() {
     } else if (type == "create_room") {
         QString username = jsonObj.value("username").toString();
         roomController->handleCreateRoom(clientSocket, username);
-
-        // Sử dụng một `QTimer::singleShot` để gửi phản hồi tiếp theo một cách bất đồng bộ
-        QTimer::singleShot(1000, [=]() {
-            authController->handleGetOnlinePlayers(clientSocket);
-        });
     } else if (type == "get_list_player") {
         authController->handleGetOnlinePlayers(clientSocket);
     }

@@ -19,9 +19,23 @@ void AuthController::handleLogin(QTcpSocket *client, const QString &username, co
     QString errorMessage;
     if (service->loginUser(username, password, errorMessage)) {
         service->playerLoggedIn(client, username);
-        sendResponse(client, "login_ack", "success", "Login successful!");
+
+        // Lấy thông tin người dùng
+        User user = service->getUserInfo(username);
+
+        // Gửi phản hồi bao gồm thông tin username và elo
+        QJsonObject response;
+        response["type"] = "login_ack";
+        response["status"] = "success";
+        response["message"] = "Login successful!";
+        response["name"] = user.getName();
+        response["elo"] = user.getElo();
+
+        QJsonDocument doc(response);
+        client->write(doc.toJson());
+        client->flush();
     } else {
-        sendResponse(client, "login_ack", "failed", errorMessage);
+        sendResponse(client, "login_ack", "failure", errorMessage);
     }
 }
 
