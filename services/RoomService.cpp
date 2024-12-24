@@ -147,7 +147,7 @@ QString RoomService::createMatch(const QString &player1, const QString &player2)
 
     // Gửi phản hồi thành công cho người chơi thứ hai
     QJsonObject response2;
-    response2["type"] = "find_match_ack";
+    response2["type"] = "start_game_ack";
     response2["status"] = "success";
     response2["match_id"] = matchId;
     response2["opponent"] = player1;
