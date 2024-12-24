@@ -164,5 +164,14 @@ User UserRepository::getUserByUsername(const QString &username) const {
     return user;
 }
 
+QTcpSocket* UserRepository::getSocketByUserName(const QString &username) const {
+    // Duyệt qua danh sách onlinePlayers để tìm socket tương ứng với username
+    for (auto it = onlinePlayers.begin(); it != onlinePlayers.end(); ++it) {
+        if (it.value().getUsername() == username) {
+            return it.key(); // Trả về socket tương ứng
+        }
+    }
+    return nullptr; // Không tìm thấy username
+}
 
 

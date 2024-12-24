@@ -46,7 +46,7 @@ ChessServer::ChessServer(QObject *parent) : QTcpServer(parent) {
     authController = new AuthController(authService, this);
 
     roomRepository = new RoomRepository(db);
-    roomService = new RoomService(roomRepository);
+    roomService = new RoomService(roomRepository, authService, matchService);
     roomController = new RoomController(roomService, authService, this);
 
     connect(this, &QTcpServer::newConnection, this, &ChessServer::onNewConnection);
@@ -127,6 +127,11 @@ void ChessServer::onReadyRead() {
         roomController->handleCreateRoom(clientSocket, username);
     } else if (type == "get_list_player") {
         authController->handleGetOnlinePlayers(clientSocket);
+    } else if( type == "invite_player") {
+        QString username = jsonObj.value("username").toString();
+        QString name = jsonObj.value("name").toString();
+        QString invite_player = jsonObj.value("invite_player").toString();
+        roomController->handleInvite(clientSocket,username, invite_player, name);
     }
     else {
         qDebug() << "Unknown request type:" << type;

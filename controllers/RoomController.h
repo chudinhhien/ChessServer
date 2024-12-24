@@ -13,6 +13,8 @@ public:
     explicit RoomController(RoomService *service, AuthService *authService, QObject *parent = nullptr);
 
     void handleCreateRoom(QTcpSocket *client, const QString &username);
+    void handleInvite(QTcpSocket *client, const QString &fromPlayer, const QString &toPlayer, const QString &fromPlayerName);
+    void handleInviteResponse(QTcpSocket *client, const QString &toPlayer, bool accepted);
 
 private:
     RoomService *service;

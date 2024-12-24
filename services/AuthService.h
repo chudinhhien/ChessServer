@@ -15,6 +15,7 @@ public:
     void updatePlayerStatus(QTcpSocket *socket, const QString &status);
     User getUserInfo(const QString &username) const;
     QString getUsernameBySocket(QTcpSocket *socket) const;
+    QTcpSocket *getSocketByUserName(const QString &username) const;
     QList<User> getOnlinePlayers() const;
 private:
     UserRepository *repository;

@@ -59,3 +59,7 @@ void AuthService::updatePlayerStatus(QTcpSocket *socket, const QString &status) 
 User AuthService::getUserInfo(const QString &username) const {
     return repository->getUserByUsername(username);
 }
+
+QTcpSocket* AuthService::getSocketByUserName(const QString &username) const {
+    return repository->getSocketByUserName(username);
+};

@@ -25,3 +25,25 @@ void RoomController::handleCreateRoom(QTcpSocket *client, const QString &usernam
 
     qDebug() << "Create room response sent to client:" << response;
 }
+
+void RoomController::handleInvite(QTcpSocket *client, const QString &fromPlayer, const QString &toPlayer, const QString &fromPlayerName) {
+    // Lấy socket của người được mời (toPlayer)
+    QTcpSocket *toSocket = authService->getSocketByUserName(toPlayer);
+
+    if (toSocket) {
+        service->sendInvite(fromPlayer, toPlayer, client, toSocket, fromPlayerName);
+    } else {
+        // Người được mời không có socket (trường hợp ngoại lệ)
+        QJsonObject response;
+        response["type"] = "invite_ack";
+        response["status"] = "failure";
+        response["message"] = "Player not available.";
+        QJsonDocument doc(response);
+        client->write(doc.toJson());
+        client->flush();
+    }
+}
+
+void RoomController::handleInviteResponse(QTcpSocket *client, const QString &toPlayer, bool accepted) {
+    service->handleInviteResponse(toPlayer, accepted);
+}
