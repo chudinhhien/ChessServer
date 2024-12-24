@@ -7,6 +7,7 @@
 #include <QRandomGenerator>
 #include <QProcessEnvironment>
 #include <utils.h>
+#include <nlohmann/json.hpp>
 #include <jwt-cpp/jwt.h>
 #include <jwt-cpp/traits/nlohmann-json/traits.h>
 #include <QJsonDocument>

@@ -62,6 +62,11 @@ void ChessServer::onReadyRead() {
     QJsonObject jsonObj = jsonData.object();
     QString type = jsonObj.value("type").toString();
 
+    if (activeGames.contains(clientSocket)) {
+        handleGameRequest(clientSocket, jsonObj);
+        return;
+    }
+
     if (type == "register") {
         handleRegister(jsonObj, clientSocket);
     }
@@ -167,5 +172,16 @@ void ChessServer::handleLogin(const QJsonObject &jsonObj, QTcpSocket *clientSock
         // sendOnlinePlayers(clientSocket);
     } else {
         sendResponse(clientSocket, "login_ack", "failed", errorMessage);
+    }
+}
+
+void ChessServer::handleGameRequest(QTcpSocket *clientSocket, const QJsonObject &jsonObj) {
+    Game *game = activeGames[clientSocket];  // Lấy Game đang xử lý client này
+    if (game) {
+        // Chuyển tiếp JSON đến Game để xử lý
+        game->handlePlayerMove(clientSocket == game->player1 ? game->player1 : game->player2,
+                               clientSocket == game->player1 ? game->player2 : game->player1);
+    } else {
+        sendErrorResponse(clientSocket, "Game session not found.");
     }
 }

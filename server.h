@@ -8,6 +8,7 @@
 #include "authenticationmanager.h"
 #include "Matchmaker.h"
 #include "ClientManager.h"
+#include "Game.h"
 
 class ChessServer : public QTcpServer {
     Q_OBJECT
@@ -24,7 +25,9 @@ private:
     ClientManager *clientManager;
     QMap<QTcpSocket*, QString> clients;
     AuthenticationManager authManager;
+    QHash<QTcpSocket *, Game *> activeGames;  // Ánh xạ giữa client socket và Game
 
+    void handleGameRequest(QTcpSocket *clientSocket, const QJsonObject &jsonObj);
     void sendResponse(QTcpSocket *clientSocket, const QString &type, const QString &status, const QString &message, const QString &token = "");
     void sendErrorResponse(QTcpSocket *clientSocket, const QString &errorMessage);
     void sendOnlinePlayers(QTcpSocket *clientSocket);

@@ -117,6 +117,7 @@ void Matchmaker::startMatch(QTcpSocket *player1, QTcpSocket *player2) {
     // Tạo luồng GameThread để xử lý trận đấu
     Game *game = new Game(player1, player2, matchId);  // Truyền match_id vào game
     game->start();  // Khởi chạy thread xử lý trận đấu
+
 }
 
 void Matchmaker::sendErrorResponse(QTcpSocket *clientSocket, const QString &errorMessage) {
