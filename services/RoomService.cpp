@@ -130,3 +130,34 @@ void RoomService::handleInviteResponse(const QString &fromPlayer, bool accepted)
         qDebug() << "Invite declined by" << toPlayer << "from" << fromPlayer;
     }
 }
+
+QString RoomService::createMatch(const QString &player1, const QString &player2) {
+    QTcpSocket* player1Socket = authService->getSocketByUserName(player1);
+    QTcpSocket* player2Socket = authService->getSocketByUserName(player2);
+    QString matchId = matchService->createMatch(player1, player2, player1Socket , player2Socket);
+    QJsonObject response1;
+    response1["type"] = "find_match_ack";
+    response1["status"] = "success";
+    response1["match_id"] = matchId;
+    response1["opponent"] = player2;
+    response1["role"] = "WHITE";
+    response1["message"] = "Match created successfully.";
+    player1Socket->write(QJsonDocument(response1).toJson());
+    player1Socket->flush();
+
+    // Gửi phản hồi thành công cho người chơi thứ hai
+    QJsonObject response2;
+    response2["type"] = "find_match_ack";
+    response2["status"] = "success";
+    response2["match_id"] = matchId;
+    response2["opponent"] = player1;
+    response2["role"] = "BLACK";
+    response2["message"] = "Match created successfully.";
+    player2Socket->write(QJsonDocument(response2).toJson());
+    player2Socket->flush();
+
+    qDebug() << "Match created with ID:" << matchId
+             << "Player1:" << player1
+             << "Player2:" << player2;
+    return matchId;
+}

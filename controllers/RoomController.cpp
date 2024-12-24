@@ -47,3 +47,7 @@ void RoomController::handleInvite(QTcpSocket *client, const QString &fromPlayer,
 void RoomController::handleInviteResponse(QTcpSocket *client, const QString &toPlayer, bool accepted) {
     service->handleInviteResponse(toPlayer, accepted);
 }
+
+QString RoomController::createMatch(const QString &player1, const QString &player2) {
+    return service->createMatch(player1,player2);
+}

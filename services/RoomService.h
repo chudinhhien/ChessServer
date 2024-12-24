@@ -14,6 +14,7 @@ public:
     bool createRoom(const QString &username, QString &roomId, QString &message);
     void sendInvite(const QString &fromPlayer, const QString &toPlayer, QTcpSocket *fromSocket, QTcpSocket *toSocket, const QString &fromPlayerName);
     void handleInviteResponse(const QString &toPlayer, bool accepted);
+    QString createMatch(const QString &player1, const QString &player2);
 
 private:
     RoomRepository *repository;
