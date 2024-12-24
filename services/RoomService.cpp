@@ -75,6 +75,7 @@ void RoomService::handleInviteResponse(const QString &fromPlayer, bool accepted)
 
         // Lấy thông tin người được mời từ AuthService
         User toUser = authService->getUserInfo(toPlayer);
+        User fromUser = authService->getUserInfo(fromPlayer);
 
         // Tạo phản hồi cho người mời
         QJsonObject userObject;
@@ -87,9 +88,15 @@ void RoomService::handleInviteResponse(const QString &fromPlayer, bool accepted)
         responseMessage["message"] = "Invite accepted.";
         responseMessage["user"] = userObject;
 
+        userObject["name"] = fromUser.getName();
+        userObject["username"] = fromUser.getUsername();
+        userObject["elo"] = fromUser.getElo();
+        userObject["state"] = fromUser.getState(); // Trạng thái mới
+
         // Tạo phản hồi cho người được mời
         responseMessageRepond["status"] = "success";
         responseMessageRepond["message"] = "You have joined the room.";
+        responseMessageRepond["user"] = userObject;
 
         // Gửi phản hồi đến người mời
         QJsonDocument docFrom(responseMessage);
