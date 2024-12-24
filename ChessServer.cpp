@@ -132,6 +132,15 @@ void ChessServer::onReadyRead() {
         QString name = jsonObj.value("name").toString();
         QString invite_player = jsonObj.value("invite_player").toString();
         roomController->handleInvite(clientSocket,username, invite_player, name);
+    } else if( type == "respond_invite" ) {
+        QString username = jsonObj.value("username").toString();
+        QString status = jsonObj.value("status").toString();
+        QString invite_player = jsonObj.value("invite_player").toString();
+        if(status == "accept") {
+            roomController->handleInviteResponse(clientSocket, username, true);
+        } else {
+            roomController->handleInviteResponse(clientSocket, username, true);
+        }
     }
     else {
         qDebug() << "Unknown request type:" << type;

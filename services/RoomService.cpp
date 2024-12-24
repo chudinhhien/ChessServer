@@ -61,36 +61,45 @@ void RoomService::handleInviteResponse(const QString &toPlayer, bool accepted) {
         return;
     }
 
+    // Tạo thông điệp phản hồi
+    QJsonObject responseMessage;
+    responseMessage["type"] = "respond_invite_ack";
+
     if (accepted) {
-        // Tạo trận đấu
-        QString matchId = matchService->createMatch(fromPlayer, toPlayer, fromSocket, toSocket);
-        authService->updatePlayerStatus(fromSocket, "In Match");
-        authService->updatePlayerStatus(toSocket, "In Match");
+        // Cập nhật trạng thái của cả hai người chơi
+        authService->updatePlayerStatus(fromSocket, "In Room");
+        authService->updatePlayerStatus(toSocket, "In Room");
 
-        // Gửi thông báo bắt đầu trận đấu đến cả hai người chơi
-        QJsonObject matchStartMessage;
-        matchStartMessage["type"] = "match_start";
-        matchStartMessage["match_id"] = matchId;
+        // Lấy thông tin người được mời từ AuthService
+        User toUser = authService->getUserInfo(toPlayer);
 
-        QJsonDocument doc(matchStartMessage);
+        // Tạo phản hồi
+        QJsonObject userObject;
+        userObject["name"] = toUser.getName();
+        userObject["username"] = toUser.getUsername();
+        userObject["elo"] = toUser.getElo();
+        userObject["state"] = toUser.getState();
+
+        responseMessage["status"] = "success";
+        responseMessage["message"] = "Invite accepted.";
+        responseMessage["user"] = userObject;
+
+        // Gửi phản hồi đến người mời
+        QJsonDocument doc(responseMessage);
         fromSocket->write(doc.toJson());
         fromSocket->flush();
 
-        toSocket->write(doc.toJson());
-        toSocket->flush();
-
-        qDebug() << "Match started between" << fromPlayer << "and" << toPlayer;
+        qDebug() << "Invite accepted by" << toPlayer << "from" << fromPlayer;
     } else {
-        // Gửi thông báo từ chối đến người mời
-        QJsonObject declineMessage;
-        declineMessage["type"] = "invite_decline";
-        declineMessage["from"] = toPlayer;
+        // Trường hợp từ chối lời mời
+        responseMessage["status"] = "failure";
+        responseMessage["message"] = "Invite declined.";
 
-        QJsonDocument doc(declineMessage);
+        // Gửi phản hồi đến người mời
+        QJsonDocument doc(responseMessage);
         fromSocket->write(doc.toJson());
         fromSocket->flush();
 
-        qDebug() << toPlayer << "declined invite from" << fromPlayer;
+        qDebug() << "Invite declined by" << toPlayer << "from" << fromPlayer;
     }
 }
-
