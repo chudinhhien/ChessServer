@@ -63,3 +63,8 @@ User AuthService::getUserInfo(const QString &username) const {
 QTcpSocket* AuthService::getSocketByUserName(const QString &username) const {
     return repository->getSocketByUserName(username);
 };
+
+void AuthService::updatePlayerElo(const QString &username, int newElo) {
+    repository->updatePlayerElo(username, newElo);
+}
+

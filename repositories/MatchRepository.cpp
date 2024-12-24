@@ -36,3 +36,23 @@ void MatchRepository::updateMatchStatus(const QString &matchId, const QString &s
         qWarning() << "Failed to update match status:" << query.lastError().text();
     }
 }
+
+void MatchRepository::updateMatchResult(const QString &matchId, const QString &result, const QString &winner, const QString &loser, const QString &reason) {
+    QDateTime endTime;
+    QSqlQuery query(db);
+    query.prepare("UPDATE match SET result = :result, winner_username = :winner, loser_username = :loser, "
+                  "reason = :reason, end_time = :end_time WHERE match_id = :match_id");
+    query.bindValue(":result", result);
+    query.bindValue(":winner", winner);
+    query.bindValue(":loser", loser);
+    query.bindValue(":reason", reason);
+    query.bindValue(":end_time", endTime.toString(Qt::ISODate));
+    query.bindValue(":match_id", matchId);
+    query.exec();
+
+    if (query.lastError().isValid()) {
+        qDebug() << "Failed to update match result:" << query.lastError();
+    } else {
+        qDebug() << "Match result updated successfully for match ID:" << matchId;
+    }
+}

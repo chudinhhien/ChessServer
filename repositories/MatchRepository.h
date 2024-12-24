@@ -10,6 +10,7 @@ public:
 
     QString createMatch(const QString &player1, const QString &player2);
     void updateMatchStatus(const QString &matchId, const QString &status);
+    void updateMatchResult(const QString &matchId, const QString &result, const QString &winner, const QString &loser, const QString &reason);
 
 private:
     QSqlDatabase db;

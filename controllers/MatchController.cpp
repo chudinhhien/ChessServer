@@ -110,5 +110,3 @@ void MatchController::removePlayerFromQueue(QTcpSocket *socket) {
         }
     }
 }
-
-

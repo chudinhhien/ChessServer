@@ -37,13 +37,13 @@ ChessServer::ChessServer(QObject *parent) : QTcpServer(parent) {
     }
     QSqlDatabase db = QSqlDatabase::database(connectionName);
     // Khởi tạo các tầng Repository, Service, Controller
-    matchRepository = new MatchRepository(db);
-    matchService = new MatchService(matchRepository);
-    matchController = new MatchController(matchService, this);
-
     userRepository = new UserRepository(db);
     authService = new AuthService(userRepository);
     authController = new AuthController(authService, this);
+
+    matchRepository = new MatchRepository(db);
+    matchService = new MatchService(matchRepository, authService);
+    matchController = new MatchController(matchService, this);
 
     roomRepository = new RoomRepository(db);
     roomService = new RoomService(roomRepository, authService, matchService);
@@ -145,6 +145,10 @@ void ChessServer::onReadyRead() {
         QString username1 = jsonObj.value("username1").toString();
         QString username2 = jsonObj.value("username2").toString();
         roomController->createMatch(username1, username2);
+    } else if( type == "loser" ) {
+        QString matchId = jsonObj.value("matchId").toString();
+        QString loser = jsonObj.value("username").toString();
+        matchService->updateMatchResult(matchId,"",loser);
     }
     else {
         qDebug() << "Unknown request type:" << type;

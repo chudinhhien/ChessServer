@@ -21,6 +21,7 @@ public:
     User getUserByUsername(const QString &username) const;
     QTcpSocket *getSocketByUserName(const QString &username) const;
     QList<User> getOnlinePlayers() const;
+    void updatePlayerElo(const QString &username, int newElo);
 
 private:
     QMap<QTcpSocket *, User> onlinePlayers;

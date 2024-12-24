@@ -174,4 +174,13 @@ QTcpSocket* UserRepository::getSocketByUserName(const QString &username) const {
     return nullptr; // Không tìm thấy username
 }
 
+void UserRepository::updatePlayerElo(const QString &username, int newElo) {
+    // Cập nhật điểm Elo trong cơ sở dữ liệu
+    QSqlQuery query(db);
+    query.prepare("UPDATE users SET elo = :elo WHERE username = :username");
+    query.bindValue(":elo", newElo);
+    query.bindValue(":username", username);
+    query.exec();
+}
+
 

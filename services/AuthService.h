@@ -17,6 +17,7 @@ public:
     QString getUsernameBySocket(QTcpSocket *socket) const;
     QTcpSocket *getSocketByUserName(const QString &username) const;
     QList<User> getOnlinePlayers() const;
+    void updatePlayerElo(const QString &username, int newElo);
 private:
     UserRepository *repository;
 };
