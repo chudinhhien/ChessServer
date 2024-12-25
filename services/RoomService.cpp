@@ -140,7 +140,7 @@ QString RoomService::createMatch(const QString &player1, const QString &player2)
     response1["status"] = "success";
     response1["match_id"] = matchId;
     response1["opponent"] = player2;
-    response1["role"] = "WHITE";
+    response1["role"] = "BLACK";
     response1["message"] = "Match created successfully.";
     player1Socket->write(QJsonDocument(response1).toJson());
     player1Socket->flush();
@@ -151,7 +151,7 @@ QString RoomService::createMatch(const QString &player1, const QString &player2)
     response2["status"] = "success";
     response2["match_id"] = matchId;
     response2["opponent"] = player1;
-    response2["role"] = "BLACK";
+    response2["role"] = "WHITE";
     response2["message"] = "Match created successfully.";
     player2Socket->write(QJsonDocument(response2).toJson());
     player2Socket->flush();

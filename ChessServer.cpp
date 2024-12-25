@@ -135,7 +135,6 @@ void ChessServer::onReadyRead() {
     } else if( type == "respond_invite" ) {
         QString username = jsonObj.value("username").toString();
         QString status = jsonObj.value("status").toString();
-        QString invite_player = jsonObj.value("invite_player").toString();
         if(status == "accept") {
             roomController->handleInviteResponse(clientSocket, username, true);
         } else {
@@ -146,7 +145,7 @@ void ChessServer::onReadyRead() {
         QString username2 = jsonObj.value("username2").toString();
         roomController->createMatch(username1, username2);
     } else if( type == "loser" ) {
-        QString matchId = jsonObj.value("matchId").toString();
+        QString matchId = jsonObj.value("match_id").toString();
         QString loser = jsonObj.value("username").toString();
         matchService->updateMatchResult(matchId,"",loser);
     }

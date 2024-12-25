@@ -36,7 +36,7 @@ void MatchController::handleFindMatch(QTcpSocket *client, const QString &usernam
         response1["status"] = "success";
         response1["match_id"] = matchId;
         response1["opponent"] = player2.second;
-        response1["role"] = "WHITE";
+        response1["role"] = "BLACK";
         response1["message"] = "Match created successfully.";
         player1.first->write(QJsonDocument(response1).toJson());
         player1.first->flush();
@@ -47,7 +47,7 @@ void MatchController::handleFindMatch(QTcpSocket *client, const QString &usernam
         response2["status"] = "success";
         response2["match_id"] = matchId;
         response2["opponent"] = player1.second;
-        response2["role"] = "BLACK";
+        response2["role"] = "WHITE";
         response2["message"] = "Match created successfully.";
         player2.first->write(QJsonDocument(response2).toJson());
         player2.first->flush();

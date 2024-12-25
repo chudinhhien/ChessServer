@@ -1,0 +1,4 @@
+[2024-12-25 07:50:08] DEBUG: Database connected successfully.
+[2024-12-25 07:50:08] DEBUG: Server started on port: 5500
+[2024-12-25 07:50:08] DEBUG: Chess server is running.
+[2024-12-25 07:50:10] DEBUG: New client connected from: "::ffff:127.0.0.1"

@@ -12,6 +12,8 @@ QString MatchService::createMatch(const QString &player1, const QString &player2
         // Lưu socket vào bộ nhớ tạm (activeMatches)
         activeMatches[matchId] = qMakePair(socket1, socket2);
     }
+    authService->updatePlayerStatus(socket1, "In Match");
+    authService->updatePlayerStatus(socket2, "In Match");
     return matchId;
 }
 

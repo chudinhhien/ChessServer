@@ -6,6 +6,7 @@ SOURCES += \
     ChessServer.cpp \
     ClientManager.cpp \
     Game.cpp \
+    Logger.cpp \
     Matchmaker.cpp \
     authenticationmanager.cpp \
     controllers/AuthController.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     ChessServer.h \
     ClientManager.h \
     Game.h \
+    Logger.h \
     Matchmaker.h \
     authenticationmanager.h \
     controllers/AuthController.h \
@@ -44,7 +46,8 @@ HEADERS += \
 DISTFILES += \
     account.txt \
     conanfile.txt \
-    config.env
+    config.env \
+    log.txt
 
 TRANSLATIONS +=
 
